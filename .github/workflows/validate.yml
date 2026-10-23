@@ -29,6 +29,9 @@ jobs:
           # Where the installer puts it when the npm prefix is not writable.
           echo "$HOME/.local/bin" >> "$GITHUB_PATH"
 
+      - name: Show the Monoceros version
+        run: monoceros --version
+
       - name: Use this checkout as the templates of a Monoceros home
         run: |
           mkdir -p "$RUNNER_TEMP/home"
