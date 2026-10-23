@@ -6,8 +6,6 @@ clones it into `~/.monoceros/templates`, and `git pull` keeps them current.
 A new workbench then starts from the team's setup instead of from whatever
 each builder remembers.
 
-In the examples below, `acme` stands for your organisation.
-
 ## Set it up for your team
 
 Click **Use this template** at the top of this page and create a new
@@ -34,8 +32,11 @@ README, `.gitignore` and `.github/` stay out of its way.
 mv ~/.monoceros/templates ~/.monoceros/templates.mine
 ```
 
+Then clone your team's repository, with its owner and name in place of the
+placeholders:
+
 ```sh
-git clone https://github.com/acme/monoceros-templates.git ~/.monoceros/templates
+git clone https://github.com/<your-org>/<your-repo>.git ~/.monoceros/templates
 ```
 
 The files you already had usually belong in the team repository: add them with
