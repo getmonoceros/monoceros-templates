@@ -2,3 +2,7 @@
 workbenches/my-*.yml
 services/my-*.yml
 mcp-servers/my-*.yml
+
+# What macOS leaves in every folder Finder opened.
+.DS_Store
+._*
