@@ -38,9 +38,9 @@ mv ~/.monoceros/templates ~/.monoceros/templates.mine
 git clone https://github.com/acme/monoceros-templates.git ~/.monoceros/templates
 ```
 
-Bring your own files back with the `my-` prefix, so they stay out of the team
-repository (see [Personal templates](#personal-templates)). A service or MCP
-server also needs its `id:` changed to the new file name.
+The files you already had usually belong in the team repository: add them with
+a pull request. One that should stay yours keeps its name, so the workbenches
+that use it still find it, and goes into `.gitignore`.
 
 Check that Monoceros sees the team's entries. They are marked `(local)`:
 
