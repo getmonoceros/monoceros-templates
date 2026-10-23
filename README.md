@@ -55,6 +55,31 @@ Get the team's changes:
 git -C ~/.monoceros/templates pull
 ```
 
+### On Windows
+
+Monoceros keeps its home in its own WSL distribution, and
+`%USERPROFILE%\.monoceros` links to it. PowerShell does not expand `~` for
+`git`, so a `~` path ends up as a folder literally named `~` in the current
+directory. Use `$env:USERPROFILE` in PowerShell instead.
+
+Move what you already have aside:
+
+```powershell
+Rename-Item "$env:USERPROFILE\.monoceros\templates" templates.mine
+```
+
+Clone your team's repository:
+
+```powershell
+git clone https://github.com/<your-org>/<your-repo>.git "$env:USERPROFILE\.monoceros\templates"
+```
+
+Get the team's changes:
+
+```powershell
+git -C "$env:USERPROFILE\.monoceros\templates" pull
+```
+
 ## What a pull changes
 
 - **A workbench template** is copied into the workbench yml by `init`. A
