@@ -1,0 +1,43 @@
+# Validates the templates with the Monoceros CLI, so a broken file fails the
+# pull request instead of every builder's next init, add-service or apply.
+name: Validate
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          # The version check compares against the base branch.
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+
+      - name: Install Monoceros
+        run: |
+          curl -fsSL https://raw.githubusercontent.com/getmonoceros/workbench/main/installer/install.sh | bash
+          # Where the installer puts it when the npm prefix is not writable.
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+
+      - name: Use this checkout as the templates of a Monoceros home
+        run: |
+          mkdir -p "$RUNNER_TEMP/home"
+          ln -s "$GITHUB_WORKSPACE" "$RUNNER_TEMP/home/templates"
+          echo "MONOCEROS_HOME=$RUNNER_TEMP/home" >> "$GITHUB_ENV"
+
+      - name: Read every template
+        run: .github/scripts/read-templates.sh
+
+      - name: Check service versions
+        if: github.event_name == 'pull_request'
+        run: .github/scripts/check-versions.sh "origin/${{ github.base_ref }}"

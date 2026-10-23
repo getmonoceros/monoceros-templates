@@ -1,0 +1,30 @@
+id: rabbitmq
+category: service
+version: 1
+displayName: RabbitMQ
+description: "Message broker with the management UI. AMQP on `rabbitmq:5672`, the management UI on port 15672."
+service:
+  image: rabbitmq:4-management
+  defaultPort: 5672
+  httpPort: 15672
+  dataMount: /var/lib/rabbitmq
+  healthcheck:
+    test: [CMD, rabbitmq-diagnostics, -q, ping]
+    interval: 10s
+    retries: 5
+  connectionEnv:
+    URL: amqp://${RABBITMQ_DEFAULT_USER}:${RABBITMQ_DEFAULT_PASS}@${host}:${port}
+    HOST: ${host}
+    PORT: ${port}
+options:
+  RABBITMQ_DEFAULT_USER:
+    type: string
+    default: monoceros
+    surface: env
+  RABBITMQ_DEFAULT_PASS:
+    type: string
+    default: monoceros
+    surface: env
+briefing:
+  - text: "Message broker, reached in-container as host `rabbitmq`. Connect over AMQP with `$RABBITMQ_URL`, which carries the user and password; `$RABBITMQ_HOST` and `$RABBITMQ_PORT` hold the parts."
+  - text: "The management UI and its HTTP API run at `http://rabbitmq:15672`, with the user and password from `$RABBITMQ_URL`. Declare exchanges, queues and bindings in the application code at startup rather than by hand in the UI, so a fresh workbench and production get the same topology."

@@ -1,0 +1,111 @@
+# The workbench `__MONOCEROS_NAME__`. This file is the source of truth; the container
+# is built from it. Change it here or with `monoceros add-*`, then run
+# `monoceros apply __MONOCEROS_NAME__`.
+# https://getmonoceros.build/docs/concepts/configuration/
+#
+# What is in here: Node with Postgres and RabbitMQ, and Claude Code with the
+# DeepWiki MCP server. An example to replace with the setup your team starts
+# from.
+
+schemaVersion: 1
+name: __MONOCEROS_NAME__
+# Pinned runtime base image, reused on every apply (never auto-bumped).
+# `monoceros upgrade __MONOCEROS_NAME__` refreshes the tooling and moves this to the
+# latest runtime when a newer one exists.
+runtimeVersion: __MONOCEROS_RUNTIME_VERSION__
+
+# Language runtimes installed inside the dev-container. Pick the ones your
+# projects build against. The catalog of available runtimes is shown by
+# `monoceros list-components`.
+languages:
+
+# Node.js: Built into the runtime image. A bare `node` installs nothing
+# extra; pin a different major with `node:<version>`.
+# https://getmonoceros.build/docs/languages/node/
+  - node:22
+
+# Sibling containers that run alongside the dev-container (databases,
+# caches, message queues, …). Each service is reachable from inside the
+# dev-container by its name as hostname (e.g. `postgres://postgres:5432`).
+# Activating any service switches the container to docker-compose mode
+# automatically.
+services:
+
+# PostgreSQL: Relational database with seeded dev credentials and a
+# readiness healthcheck. Reachable in-container as host `postgres`.
+# https://getmonoceros.build/docs/services/postgres/
+  - name: postgres
+    ref: postgres@1
+    image: postgres:18
+    port: 5432
+    env:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - data:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "${POSTGRES_USER}", "-d", "${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    connectionEnv:
+      URL: 'postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${host}:${port}/${POSTGRES_DB}'
+      HOST: '${host}'
+      PORT: '${port}'
+      USER: '${POSTGRES_USER}'
+      PASSWORD: '${POSTGRES_PASSWORD}'
+      DB: '${POSTGRES_DB}'
+
+# RabbitMQ: Message broker with the management UI. AMQP on `rabbitmq:5672`,
+# the management UI on port 15672.
+  - name: rabbitmq
+    ref: rabbitmq@1
+    image: rabbitmq:4-management
+    port: 5672
+    httpPort: 15672
+    env:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS}
+    volumes:
+      - data:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 10s
+      retries: 5
+    connectionEnv:
+      URL: 'amqp://${RABBITMQ_DEFAULT_USER}:${RABBITMQ_DEFAULT_PASS}@${host}:${port}'
+      HOST: '${host}'
+      PORT: '${port}'
+
+# A Monoceros dev-container is shaped by features, pluggable units that drop
+# tooling (AI assistants, language CLIs, cloud SDKs) into the container and
+# bring their own options. The features active for this container are listed
+# below; adjust their options as needed. Credentials stay `${VAR}`
+# references here. Their values go in this workbench's .env file, or in
+# monoceros-config.env to share them across workbenches. Full catalog:
+# `monoceros list-components`.
+features:
+
+# Claude Code: Anthropic's CLI coding assistant. OAuth/subscription login
+# persists across container rebuilds.
+# https://getmonoceros.build/docs/features/claude/
+  - ref: ghcr.io/getmonoceros/monoceros-features/claude-code:1
+    options:
+      permissionMode: auto
+      apiKey: ${CLAUDE_CODE_API_KEY}
+    # plugins:
+    #   - url: https://github.com/acme/claude-plugins.git
+    #     enable:
+    #       - acme-conventions
+
+# MCP servers the agents in this container can reach. A catalog connector is
+# one line plus its options (`monoceros add-mcp-server __MONOCEROS_NAME__ <connector>`,
+# see `monoceros list-components`). A server the catalog does not carry goes
+# in with the config its provider publishes (`name:` plus `transport:` and
+# `command:`/`url:`), and is then just as reproducible. Credentials belong
+# in __MONOCEROS_NAME__.env behind the ${VAR} placeholders, never here.
+mcpServers:
+
+# DeepWiki: Generated documentation for public GitHub repositories.
+  - name: deepwiki

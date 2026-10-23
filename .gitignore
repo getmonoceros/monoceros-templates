@@ -1,0 +1,4 @@
+# Personal templates: they sit next to the team's and are never committed.
+workbenches/my-*.yml
+services/my-*.yml
+mcp-servers/my-*.yml

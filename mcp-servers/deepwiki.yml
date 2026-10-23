@@ -1,0 +1,9 @@
+id: deepwiki
+category: mcp-server
+displayName: DeepWiki
+description: "Generated documentation for public GitHub repositories."
+mcpServer:
+  transport: http
+  url: https://mcp.deepwiki.com/mcp
+briefing:
+  - text: "DeepWiki answers questions about public GitHub repositories from generated documentation. Ask it how an open-source dependency works before you read its source."
