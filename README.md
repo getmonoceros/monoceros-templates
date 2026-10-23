@@ -35,7 +35,7 @@ mv ~/.monoceros/templates ~/.monoceros/templates.mine
 ```
 
 ```sh
-git clone git@github.com:acme/monoceros-templates.git ~/.monoceros/templates
+git clone https://github.com/acme/monoceros-templates.git ~/.monoceros/templates
 ```
 
 Bring your own files back with the `my-` prefix, so they stay out of the team
