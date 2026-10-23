@@ -74,6 +74,13 @@ Clone your team's repository:
 git clone https://github.com/<your-org>/<your-repo>.git "$env:USERPROFILE\.monoceros\templates"
 ```
 
+Git for Windows refuses to work in it after that, because the folder belongs
+to the WSL user. Allow this one folder, once:
+
+```powershell
+git config --global --add safe.directory '%(prefix)///wsl.localhost/monoceros/home/ubuntu/.monoceros/templates'
+```
+
 Get the team's changes:
 
 ```powershell
