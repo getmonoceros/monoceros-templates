@@ -114,7 +114,7 @@ monoceros create-version rabbitmq
 
 That keeps the current file as `services/rabbitmq@<version>.yml` and raises
 `version:` in `services/rabbitmq.yml`; make your change there. Never edit an
-older version once it is merged: a workbench may still be built from it. Keep
+older version once it is in the repository: a workbench may still be built from it. Keep
 it as long as a workbench names that version.
 
 The check below enforces this on every push and pull request.
