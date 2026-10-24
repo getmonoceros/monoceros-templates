@@ -24,6 +24,9 @@ Then replace the three examples with your own:
 Monoceros reads only the `*.yml` files in these three directories. This
 README, `.gitignore` and `.github/` stay out of its way.
 
+A workbench that already works becomes a template with
+`monoceros create-template <workbench> <template> --description "…"`.
+
 ## Use it on your machine
 
 `git clone` needs an empty directory, so move what you already have aside:
