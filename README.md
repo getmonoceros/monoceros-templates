@@ -103,10 +103,16 @@ git -C "$env:USERPROFILE\.monoceros\templates" pull
 ## Change a service
 
 Workbenches built from a service carry its block, so a change gets a new
-version. Copy the current file to `services/<id>@<version>.yml` first, then
-raise `version:` in the current file and make your change. Never edit an
-older version once it is merged: a workbench may still be built from it.
-Keep it as long as a workbench names that version.
+version. Start it before you edit:
+
+```sh
+monoceros create-version rabbitmq
+```
+
+That keeps the current file as `services/rabbitmq@<version>.yml` and raises
+`version:` in `services/rabbitmq.yml`; make your change there. Never edit an
+older version once it is merged: a workbench may still be built from it. Keep
+it as long as a workbench names that version.
 
 The check below enforces this on every push and pull request.
 
