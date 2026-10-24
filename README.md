@@ -39,8 +39,8 @@ placeholders:
 git clone https://github.com/<your-org>/<your-repo>.git ~/.monoceros/templates
 ```
 
-The files you already had usually belong in the team repository: add them with
-a pull request. One that should stay yours keeps its name, so the workbenches
+The files you already had usually belong in the team repository: commit them
+there. One that should stay yours keeps its name, so the workbenches
 that use it still find it, and goes into `.gitignore`.
 
 Check that Monoceros sees the team's entries. They are marked `(local)`:
@@ -108,7 +108,7 @@ raise `version:` in the current file and make your change. Never edit an
 older version once it is merged: a workbench may still be built from it.
 Keep it as long as a workbench names that version.
 
-The check below enforces this on every pull request.
+The check below enforces this on every push and pull request.
 
 ## Personal templates
 
@@ -122,20 +122,21 @@ hyphens.
 
 A template brings images, features with their plugins, MCP servers and
 commands into everyone's workbench. Whoever can write to this repository
-decides what runs there. So changes go through pull requests and review, like
-code.
+decides what runs there. So review changes like code, in whatever way your
+team works.
 
 ## The check
 
-`.github/workflows/validate.yml` runs on every pull request and every push to
-`main`. It installs Monoceros and points it at the checkout, then:
+`.github/workflows/validate.yml` runs on every push, to any branch, and on
+every pull request. It installs Monoceros and points it at the checkout, then:
 
 - reads every descriptor and template with `monoceros list-components`, and
   fails on a broken file or a version file Monoceros leaves out;
 - renders every workbench template with `monoceros init --template`;
-- on a pull request, fails when a service changed without a new version, when
-  the previous version was not kept unchanged, or when an older version
-  changed.
+- fails when a service changed without a new version, when the previous
+  version was not kept unchanged, or when an older version changed. A push
+  is compared with the state before it, a new branch and a pull request with
+  their base.
 
 ## License
 

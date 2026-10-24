@@ -2,12 +2,30 @@
 #
 # A service a workbench was built from must not change under it. A change
 # raises `version` and keeps the previous file as services/<id>@<n>.yml,
-# unchanged, and an older version never changes again. Run on a pull request
-# with the base branch as the argument.
+# unchanged, and an older version never changes again. The argument is what
+# to compare with: the state before a push, or the base of a pull request.
 set -euo pipefail
 
 base=$1
 status=0
+
+# Whether the file is back at the content its version had when it was
+# introduced, in the history up to the base. That is a revert of a change
+# that should not have been made (a push straight to main without a new
+# version, say), not a change of its own. Any other content under the same
+# version is a change, even one the file had at some point in between.
+is_original() {
+  local version blob commit
+  version=$(version_of <"$1")
+  blob=$(git hash-object "$1")
+  while IFS= read -r commit; do
+    if [ "$(git show "$commit:$1" 2>/dev/null | version_of)" = "$version" ]; then
+      [ "$(git rev-parse "$commit:$1")" = "$blob" ]
+      return
+    fi
+  done < <(git log --reverse --format=%H "$base" -- "$1")
+  return 1
+}
 
 # The `version:` of a descriptor on stdin; 1 when it has none.
 version_of() {
@@ -20,6 +38,9 @@ while IFS= read -r file; do
   git cat-file -e "$base:$file" 2>/dev/null || continue
   [ -e "$file" ] || continue
 
+  [ "$(git show "$base:$file")" = "$(cat "$file")" ] && continue
+  is_original "$file" && continue
+
   name=$(basename "$file" .yml)
   case "$name" in
     *@*)
@@ -30,7 +51,6 @@ while IFS= read -r file; do
   esac
 
   old=$(git show "$base:$file")
-  [ "$old" = "$(cat "$file")" ] && continue
   before=$(printf '%s\n' "$old" | version_of)
   after=$(version_of <"$file")
 
