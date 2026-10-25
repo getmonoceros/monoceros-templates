@@ -13,13 +13,15 @@ repository in your organisation. Make it private: your templates name
 internal images, registries and hosts. Don't fork this repository instead,
 because GitHub does not let a fork of a public repository be private.
 
-Then replace the three examples with your own:
+Then replace the three examples (`standard`, `rabbitmq`, `deepwiki`) with your
+own. Keep `workbenches/template-authoring.yml`: it is the workbench an agent
+works on this repository in ([below](#let-an-agent-work-on-it)).
 
-| Directory      | Holds                                                                                                            | Used by                                        |
-| -------------- | ---------------------------------------------------------------------------------------------------------------- | ---------------------------------------------- |
-| `workbenches/` | prepared workbench ymls ([format](https://getmonoceros.build/docs/reference/lifecycle/init/#your-own-templates)) | `monoceros init <name> --template=<file name>` |
-| `services/`    | service descriptors ([format](https://getmonoceros.build/docs/services/overview/#keep-your-own-services))        | `monoceros add-service <name> <file name>`     |
-| `mcp-servers/` | MCP server descriptors ([format](https://getmonoceros.build/docs/mcp-servers/overview/#keep-your-own-servers))   | `monoceros add-mcp-server <name> <file name>`  |
+| Directory      | Holds                                                                                                         | Used by                                        |
+| -------------- | ------------------------------------------------------------------------------------------------------------- | ---------------------------------------------- |
+| `workbenches/` | prepared workbench ymls ([format](https://getmonoceros.build/docs/reference/templates/workbench-template/))   | `monoceros init <name> --template=<file name>` |
+| `services/`    | service descriptors ([format](https://getmonoceros.build/docs/reference/templates/service-descriptor/))       | `monoceros add-service <name> <file name>`     |
+| `mcp-servers/` | MCP server descriptors ([format](https://getmonoceros.build/docs/reference/templates/mcp-server-descriptor/)) | `monoceros add-mcp-server <name> <file name>`  |
 
 Monoceros reads only the `*.yml` files in these three directories. This
 README, `.gitignore` and `.github/` stay out of its way.
@@ -118,6 +120,23 @@ older version once it is in the repository: a workbench may still be built from 
 it as long as a workbench names that version.
 
 The check below enforces this on every push and pull request.
+
+## Let an agent work on it
+
+An agent works in a workbench, not on your machine. The template
+`template-authoring` sets one up for this repository: Claude Code, and the
+Monoceros docs MCP server, where the agent looks up the formats. Create it
+with your team's repository:
+
+```sh
+monoceros init team-templates --template=template-authoring --with-repos=https://github.com/<your-org>/<your-repo>.git
+```
+
+Fill in `GITHUB_API_TOKEN` in `team-templates.env`, so the agent can push, then
+build it with `monoceros apply team-templates`. The agent pushes its change,
+the check tests it, and you get it on your machine with `git pull`. The
+[team templates guide](https://getmonoceros.build/docs/guides/team-templates/#create-a-template-with-an-agent)
+walks through it.
 
 ## Personal templates
 

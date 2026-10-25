@@ -1,0 +1,51 @@
+# The workbench `__MONOCEROS_NAME__`. This file is the source of truth; the container
+# is built from it. Change it here or with `monoceros add-*`, then run
+# `monoceros apply __MONOCEROS_NAME__`.
+# https://getmonoceros.build/docs/concepts/configuration/
+#
+# A workbench in which an agent works on this repository: Claude Code, and the
+# Monoceros docs MCP server it looks up the template formats in. Add this
+# repository when you create it: monoceros init <name>
+# --template=template-authoring --with-repos=<URL of this repository>.
+
+schemaVersion: 1
+name: __MONOCEROS_NAME__
+# Pinned runtime base image, reused on every apply (never auto-bumped).
+# `monoceros upgrade __MONOCEROS_NAME__` refreshes the tooling and moves this to the
+# latest runtime when a newer one exists.
+runtimeVersion: __MONOCEROS_RUNTIME_VERSION__
+
+# A Monoceros dev-container is shaped by features, pluggable units that drop
+# tooling (AI assistants, language CLIs, cloud SDKs) into the container and
+# bring their own options. The features active for this container are listed
+# below; adjust their options as needed. Credentials stay `${VAR}`
+# references here. Their values go in this workbench's .env file, or in
+# monoceros-config.env to share them across workbenches. Full catalog:
+# `monoceros list-components`.
+features:
+
+# Claude Code: Anthropic's CLI coding assistant. OAuth/subscription login
+# persists across container rebuilds.
+# https://getmonoceros.build/docs/features/claude/
+  - ref: ghcr.io/getmonoceros/monoceros-features/claude-code:1
+    options:
+      permissionMode: auto
+      apiKey: ${CLAUDE_CODE_API_KEY}
+    # plugins:
+    #   - url: https://github.com/acme/claude-plugins.git
+    #     enable:
+    #       - acme-conventions
+
+# MCP servers the agents in this container can reach. A catalog connector is
+# one line plus its options (`monoceros add-mcp-server __MONOCEROS_NAME__ <connector>`,
+# see `monoceros list-components`). A server the catalog does not carry goes
+# in with the config its provider publishes (`name:` plus `transport:` and
+# `command:`/`url:`), and is then just as reproducible. Credentials belong
+# in __MONOCEROS_NAME__.env behind the ${VAR} placeholders, never here.
+mcpServers:
+
+# Monoceros Docs: The Monoceros documentation and component catalog,
+# including the formats of workbench templates and service and MCP server
+# descriptors.
+# https://getmonoceros.build/docs/mcp-servers/monoceros-docs/
+  - name: monoceros-docs
