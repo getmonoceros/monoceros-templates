@@ -31,22 +31,36 @@ A workbench that already works becomes a template with
 
 ## Use it on your machine
 
-`git clone` needs an empty directory, so move what you already have aside:
+Monoceros reads these files from `~/.monoceros/templates`. Turn that folder
+into a copy of your team's repository. Files you already keep there stay where
+they are, and without a folder yet, the same steps create it.
+
+Make the folder a Git repository:
 
 ```sh
-mv ~/.monoceros/templates ~/.monoceros/templates.mine
+git init -b main ~/.monoceros/templates
 ```
 
-Then clone your team's repository, with its owner and name in place of the
-placeholders:
+Connect it to your team's repository:
 
 ```sh
-git clone https://github.com/<your-org>/<your-repo>.git ~/.monoceros/templates
+git -C ~/.monoceros/templates remote add origin [HTTPS URL of your team repository]
 ```
+
+Get the repository's files:
+
+```sh
+git -C ~/.monoceros/templates pull --set-upstream origin main
+```
+
+If one of your files has the same name as a file in the repository, the pull
+stops and names it. Rename your file and run the pull again, then keep the one
+you want. A service or MCP server must end up under its old name, because your
+workbenches name it.
 
 The files you already had usually belong in the team repository: commit them
-there. One that should stay yours keeps its name, so the workbenches
-that use it still find it, and goes into `.gitignore`.
+there. One that should stay yours keeps its name, so the workbenches that use
+it still find it, and goes into `.gitignore`.
 
 Check that Monoceros sees the team's entries. They are marked `(local)`:
 
@@ -67,23 +81,29 @@ Monoceros keeps its home in its own WSL distribution, and
 `git`, so a `~` path ends up as a folder literally named `~` in the current
 directory. Use `$env:USERPROFILE` in PowerShell instead.
 
-Move what you already have aside:
+Make the folder a Git repository:
 
 ```powershell
-Rename-Item "$env:USERPROFILE\.monoceros\templates" templates.mine
+git init -b main "$env:USERPROFILE\.monoceros\templates"
 ```
 
-Clone your team's repository:
-
-```powershell
-git clone https://github.com/<your-org>/<your-repo>.git "$env:USERPROFILE\.monoceros\templates"
-```
-
-Git for Windows refuses to work in it after that, because the folder belongs
-to the WSL user. Allow this one folder, once:
+Git for Windows refuses to work in it until you allow it, because the folder
+belongs to the WSL user. Allow this one folder, once:
 
 ```powershell
 git config --global --add safe.directory '%(prefix)///wsl.localhost/monoceros/home/ubuntu/.monoceros/templates'
+```
+
+Connect it to your team's repository:
+
+```powershell
+git -C "$env:USERPROFILE\.monoceros\templates" remote add origin [HTTPS URL of your team repository]
+```
+
+Get the repository's files:
+
+```powershell
+git -C "$env:USERPROFILE\.monoceros\templates" pull --set-upstream origin main
 ```
 
 Get the team's changes:
@@ -129,7 +149,7 @@ Monoceros docs MCP server, where the agent looks up the formats. Create it
 with your team's repository:
 
 ```sh
-monoceros init team-templates --template=template-authoring --with-repos=https://github.com/<your-org>/<your-repo>.git
+monoceros init team-templates --template=template-authoring --with-repos=[HTTPS URL of your team repository]
 ```
 
 Fill in `GITHUB_API_TOKEN` in `team-templates.env`, so the agent can push, then
