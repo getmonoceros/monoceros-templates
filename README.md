@@ -135,7 +135,7 @@ monoceros init team-templates --template=template-authoring --with-repos=https:/
 Fill in `GITHUB_API_TOKEN` in `team-templates.env`, so the agent can push, then
 build it with `monoceros apply team-templates`. The agent pushes its change,
 the check tests it, and you get it on your machine with `git pull`. The
-[team templates guide](https://getmonoceros.build/docs/guides/team-templates/#create-a-template-with-an-agent)
+[guide](https://getmonoceros.build/docs/guides/templates/#create-a-template-with-an-agent)
 walks through it.
 
 ## Personal templates
